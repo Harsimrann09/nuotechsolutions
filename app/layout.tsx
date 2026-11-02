@@ -1,0 +1,5 @@
+import type {Metadata} from 'next';
+import './globals.css';
+export const metadata:Metadata={title:'Nuotech Solutions Pvt Ltd',description:'Quick mold and die change systems, injection molding robots, granulators, and screws & barrels for manufacturers across India.',openGraph:{title:'Nuotech Solutions Pvt Ltd',description:'Global technology. Local accountability.',type:'website'}};
+const themeScript=`try{const t=localStorage.getItem('nuotech-theme');document.documentElement.dataset.theme=t==='dark'?'dark':'light'}catch{}`;
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en" data-theme="light" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html:themeScript}}/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/><link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/></head><body>{children}</body></html>}

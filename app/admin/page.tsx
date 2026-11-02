@@ -1,0 +1,14 @@
+"use client";
+import { useEffect, useState } from 'react';
+
+type Enquiry = { _id: string; name: string; email: string; company?: string; phone?: string; city?: string; message?: string; interests?: string[]; status?: string; createdAt?: string; isTest?: boolean };
+
+export default function AdminPage() {
+  const [password, setPassword] = useState(''); const [loggedIn, setLoggedIn] = useState(false); const [error, setError] = useState(''); const [items, setItems] = useState<Enquiry[]>([]); const [loading, setLoading] = useState(false);
+  async function load() { setLoading(true); const response = await fetch('/api/admin/enquiries'); if (response.ok) { setLoggedIn(true); setItems((await response.json()).enquiries); } else setLoggedIn(false); setLoading(false); }
+  useEffect(() => { load(); }, []);
+  async function login(event: React.FormEvent) { event.preventDefault(); setError(''); const response = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) }); if (!response.ok) { setError((await response.json()).error || 'Login failed.'); return; } setPassword(''); await load(); }
+  async function logout() { await fetch('/api/admin/logout', { method: 'POST' }); setLoggedIn(false); setItems([]); }
+  if (!loggedIn) return <main className="admin-shell"><div className="admin-card"><span className="eyebrow">Nuotech Solutions Pvt Ltd</span><h1>Admin dashboard</h1><p>Sign in to view website enquiries.</p><form onSubmit={login}><label>Admin password<input type="password" value={password} onChange={event => setPassword(event.target.value)} autoComplete="current-password" required /></label><button className="btn btn-primary" type="submit">Sign in</button>{error && <p className="admin-error">{error}</p>}</form></div></main>;
+  return <main className="admin-shell"><div className="admin-heading"><div><span className="eyebrow">Nuotech Solutions Pvt Ltd</span><h1>Enquiries</h1></div><div><button className="btn btn-ghost" onClick={load} disabled={loading}>Refresh</button> <button className="btn btn-ghost" onClick={logout}>Sign out</button></div></div><div className="admin-table-wrap"><table><thead><tr><th>Date</th><th>Contact</th><th>Company</th><th>Interests</th><th>Message</th><th>Status</th></tr></thead><tbody>{items.map(item => <tr key={item._id} className={item.isTest ? 'test-row' : ''}><td>{item.createdAt ? new Date(item.createdAt).toLocaleString('en-IN') : '—'}</td><td><b>{item.name}</b><br /><a href={`mailto:${item.email}`}>{item.email}</a>{item.phone && <><br /><a href={`tel:${item.phone}`}>{item.phone}</a></>}</td><td>{item.company || '—'}<br />{item.city || ''}</td><td>{item.interests?.join(', ') || '—'}</td><td>{item.message || '—'}</td><td><span className="admin-status">{item.status || 'new'}{item.isTest ? ' · test' : ''}</span></td></tr>)}</tbody></table>{!items.length && <p className="admin-empty">No enquiries found.</p>}</div></main>;
+}
